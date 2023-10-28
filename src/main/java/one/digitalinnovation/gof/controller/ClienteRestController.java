@@ -1,5 +1,7 @@
 package one.digitalinnovation.gof.controller;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import one.digitalinnovation.gof.model.Cliente;
 import one.digitalinnovation.gof.service.ClienteService;
@@ -35,19 +38,21 @@ public class ClienteRestController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
-		return ResponseEntity.ok(clienteService.buscarPorId(id));
+		return ResponseEntity.ok().body(clienteService.buscarPorId(id));
 	}
 
 	@PostMapping
-	public ResponseEntity<Cliente> inserir(@RequestBody Cliente cliente) {
-		clienteService.inserir(cliente);
-		return ResponseEntity.ok(cliente);
+	public ResponseEntity<Cliente> inserir(@RequestBody Cliente objCliente) {
+		Cliente cliente = clienteService.inserir(objCliente);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+				.buildAndExpand(cliente.getId()).toUri();
+		return ResponseEntity.created(uri).body(cliente);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
-		clienteService.atualizar(id, cliente);
-		return ResponseEntity.ok(cliente);
+	public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente objCliente) {
+		Cliente cliente = clienteService.atualizar(id, objCliente);
+		return ResponseEntity.ok().body(cliente);
 	}
 
 	@DeleteMapping("/{id}")
